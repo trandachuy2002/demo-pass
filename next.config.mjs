@@ -2,10 +2,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     output: "export",
-    serverExternalPackages: ["@meshsdk/core", "@meshsdk/core-cst", "@meshsdk/react"],
-    experimental: {
-        after: true,
-    },
     typescript: {
         ignoreBuildErrors: true,
     },
@@ -26,6 +22,6 @@ const nextConfig = {
         }
         return config;
     },
-};
-export default nextConfig;
+}
+export default nextConfig
 

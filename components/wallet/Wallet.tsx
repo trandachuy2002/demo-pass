@@ -94,9 +94,10 @@ const Wallet = () => {
 
 
     useEffect(() => {
+        if (!informationUser) return
         getContract(form);
         if (form.watch('closingTheContract.lockedTxHash')) getUtxo(form);
-    }, [form.watch('closingTheContract.lockedTxHash')]);
+    }, [form.watch('closingTheContract.lockedTxHash'), informationUser]);
 
 
 
