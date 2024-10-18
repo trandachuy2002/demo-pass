@@ -22,6 +22,18 @@ import { useAuthStore } from "@/store/authStores";
 import useCookieStore from "@/store/useCookieStore";
 import { useAlertDialogStore } from "@/store/useAlertDialogStore";
 
+declare const LANGUAGE_VERSIONS: {
+    V1: string;
+    V2: string;
+    V3: string;
+};
+
+type LanguageVersion = keyof typeof LANGUAGE_VERSIONS;
+
+type PlutusScript = {
+    version: LanguageVersion;
+    code: string;
+};
 
 const dataType = [
     {
@@ -54,17 +66,8 @@ const defaulValues = {
         }
     ]
 }
-declare const LANGUAGE_VERSIONS: {
-    V1: string;
-    V2: string;
-    V3: string;
-};
+
 const Wallet = () => {
-    type LanguageVersion = keyof typeof LANGUAGE_VERSIONS;
-    type PlutusScript = {
-        version: LanguageVersion;
-        code: string;
-    };
     const formatContract = (contract: any): PlutusScript => {
         return {
             code: contract?.cborHex,
@@ -135,11 +138,6 @@ const Wallet = () => {
     useEffect(() => {
         if (contract) setPlutusScript(formatContract(contract.contract));
     }, [contract]);
-
-    console.log("contract", contract);
-    console.log("utxo", utxo);
-    console.log("plutusScript", plutusScript);
-
 
     return (
         <div className="flex flex-col gap-4 justify-between items-center">
