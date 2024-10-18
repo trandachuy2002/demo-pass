@@ -51,8 +51,8 @@ export function DialogCustom({ }: Props) {
                             <span className="sr-only">Close</span>
                         </DialogClose> */}
                         <DialogHeader className="flex items-center justify-center w-full">
-                            <DialogTitle className={`capitalize 2xl:text-[32px] text-2xl font-semibold`}>
-                                Đăng nhập
+                            <DialogTitle className={`capitalize 2xl:text-3xl text-2xl font-semibold`}>
+                                Demo smart contract Aladin
                             </DialogTitle>
                         </DialogHeader>
                     </div>
