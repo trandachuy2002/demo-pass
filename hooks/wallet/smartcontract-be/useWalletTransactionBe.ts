@@ -225,8 +225,23 @@ export const useWalletTransactionBe = () => {
         // toastCore.success("Transaction is submitted");
     };
 
+    const utxoMutation = useMutation({
+        mutationFn: async ({
+            scriptAddressUnLock,
+            lockedTxHash,
+        }: {
+            scriptAddressUnLock: string;
+            lockedTxHash: string;
+        }) => {
+            return await apiWallet.findutxo(scriptAddressUnLock, lockedTxHash);
+        },
+    });
+
     const getUtxo = async (lockedTxHash: any) => {
-        const { data } = await apiWallet.findutxo(scriptAddressUnLock, lockedTxHash);
+        const { data } = await utxoMutation.mutateAsync({
+            scriptAddressUnLock: scriptAddressUnLock,
+            lockedTxHash: lockedTxHash,
+        });
         setUtxo(data);
     };
 
@@ -245,6 +260,6 @@ export const useWalletTransactionBe = () => {
         plutusScript,
         setPlutusScript,
         utxo,
-        isLoading: lockFunctionBeMutate.isPending || unlockFunctionBeMutate.isPending,
+        isLoading: lockFunctionBeMutate.isPending || unlockFunctionBeMutate.isPending || utxoMutation.isPending,
     };
 };
