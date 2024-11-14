@@ -235,6 +235,9 @@ export const useWalletTransactionBe = () => {
         }) => {
             return await apiWallet.findutxo(scriptAddressUnLock, lockedTxHash);
         },
+        retry: 3,
+        gcTime: 3000,
+        retryDelay: 3000,
     });
 
     const getUtxo = async (lockedTxHash: any) => {
