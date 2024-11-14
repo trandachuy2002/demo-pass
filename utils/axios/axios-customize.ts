@@ -1,9 +1,17 @@
+import { KEY_COOKIES } from "@/constants/Cookie";
 import { CookieCore } from "@/lib/cookie";
 import axios, { AxiosError, AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from "axios";
-const baseUrl = process.env.NEXT_PUBLIC_URL_API;
+const baseUrl = process.env.NEXT_PUBLIC_URL_API_BACKEND;
+
+export const checkPathName = () => {
+    if (typeof window !== "undefined") {
+        const pathname = window.location.pathname ?? "";
+        return pathname.startsWith("/smartcontract-be");
+    }
+};
 
 const httpClient: AxiosInstance = axios.create({
-    baseURL: baseUrl,
+    baseURL: checkPathName() ? "" : baseUrl,
     withCredentials: false,
     params: {},
 });
@@ -34,9 +42,14 @@ const handleError = (error: AxiosError): Promise<never> => {
 // Request interceptor để thêm header Authorization nếu có token
 httpClient.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
-        const token = CookieCore.get("token_p");
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
+        if (checkPathName()) {
+            if (CookieCore.get(KEY_COOKIES.WEBSITE_PAAS_BWORKS) !== undefined) {
+                config.headers.Authorization = `Bearer ${CookieCore.get(KEY_COOKIES.WEBSITE_PAAS_BWORKS)}`;
+            }
+        } else {
+            if (CookieCore.get(KEY_COOKIES.WEBSITE) !== undefined) {
+                config.headers.Authorization = `Bearer ${CookieCore.get(KEY_COOKIES.WEBSITE)}`;
+            }
         }
         return config;
     },

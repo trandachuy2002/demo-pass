@@ -10,6 +10,7 @@ import { useAuthStore } from '@/store/authStores';
 import useCookieStore from '@/store/useCookieStore';
 import AlertDialogCustom from '../alert/AlertDialogCustom';
 import { useAlertDialogStore } from '@/store/useAlertDialogStore';
+import { checkPathName } from '@/utils/axios/axios-customize';
 const LayoutRoot = dynamic(() => import("@/components/layout/LayoutRoot"), { ssr: false });
 
 const LayoutContainer = ({ children }: Readonly<{ children: React.ReactNode; }>) => {
@@ -24,7 +25,7 @@ const LayoutContainer = ({ children }: Readonly<{ children: React.ReactNode; }>)
     const { openDialogCustom, setOpenDialogCustom } = useDialogStore()
 
     useEffect(() => {
-        if (!informationUser && !getCookie()) {
+        if (!informationUser && !getCookie() && !checkPathName()) {
             setOpenDialogCustom(true)
         }
     }, [informationUser, openAlertDialog])

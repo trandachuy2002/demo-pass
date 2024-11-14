@@ -103,7 +103,6 @@ const Wallet = () => {
     }, [form.watch('closingTheContract.lockedTxHash'), informationUser]);
 
 
-
     useEffect(() => {
         if (address) {
             onParseAddress(address)

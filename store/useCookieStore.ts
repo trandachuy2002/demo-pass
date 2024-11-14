@@ -1,21 +1,17 @@
 "use client";
-
 import Cookies from "js-cookie";
-interface IUseCookie {
-    key: "token_p" | string;
-    initialValue?: string;
-}
+import { KEY_COOKIES } from "@/constants/Cookie";
 
-const useCookieStore = (key: IUseCookie["key"] = "token_p", initialValue?: IUseCookie["initialValue"]) => {
-    const setCookie = (value: string, options?: Cookies.CookieAttributes) => {
+const useCookieStore = () => {
+    const setCookie = (key: string = KEY_COOKIES.WEBSITE, value: string, options?: Cookies.CookieAttributes) => {
         Cookies.set(key, value, options);
     };
 
-    const removeCookie = (key: IUseCookie["key"] = "token_p", options?: Cookies.CookieAttributes) => {
+    const removeCookie = (key: string = KEY_COOKIES.WEBSITE, options?: Cookies.CookieAttributes) => {
         Cookies.remove(key, options);
     };
 
-    const getCookie = () => {
+    const getCookie = (key: string = KEY_COOKIES.WEBSITE) => {
         return Cookies.get(key);
     };
 

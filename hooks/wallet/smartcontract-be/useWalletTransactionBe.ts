@@ -1,9 +1,12 @@
+"use client";
 import { toastCore } from "@/lib/toast";
 import apiWallet from "@/services/wallet/wallet.services";
-import { useWalletStore } from "@/store/walletStore";
-import { Transaction } from "@meshsdk/core";
+import { useWalletStateBe } from "@/store/walletStore";
+import { Transaction, MeshTxBuilder, TxIn, MintItem } from "@meshsdk/core";
 import { useWallet } from "@meshsdk/react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+
 interface IData {
     createContract: {
         amount: string; // type for amount
@@ -14,34 +17,53 @@ interface IData {
         reCeiveAddress: string;
     };
     datum: Array<any>; // type for datum, adjust as necessary
+    idCampaign?: string | number | any;
+    money_ada?: string | number | any;
 }
-export const useWalletTransaction = () => {
+
+export const useWalletTransactionBe = () => {
+    const queryClient = useQueryClient();
+
     const { connected, wallet } = useWallet();
 
-    const { setValidateMessage, dataAddress } = useWalletStore();
+    const { setValidateMessage, dataAddress } = useWalletStateBe();
 
-    let scriptAddress = "addr1w87l06eqtw5m546qxtd5nlxm7f8xfkfu9g2fua7gsp7wqsgyx9tl0";
+    const scriptAddressLock = (queryClient.getQueryData(["getCampaignBe"]) as any)?.address_smart_contract ?? "";
+
+    const scriptAddressUnLock =
+        (queryClient.getQueryData(["getCampaignBeUnLock"]) as any)?.address_smart_contract ?? "";
+
+    // let scriptAddresss = "addr1w87l06eqtw5m546qxtd5nlxm7f8xfkfu9g2fua7gsp7wqsgyx9tl0";
 
     const [utxo, setUtxo] = useState<any>(null);
 
-    const [plutusScript, setPlutusScript] = useState<any>({
-        code: "",
-        version: "",
-    });
-    const initContract = {
-        selected: "",
-        contracts: [],
-    };
+    const [plutusScript, setPlutusScript] = useState<any>({ code: "", version: "" });
+
+    const initContract = { selected: "", contracts: [] };
+
     const [redeemer, setRedeemer] = useState<any>([]);
 
     const [contract, setContract] = useState<any>(initContract);
 
+    const lockFunctionBeMutate = useMutation({
+        mutationFn: async ({ data, formData }: { data: IData; formData: FormData }) => {
+            return await apiWallet.postCreateLock(data?.idCampaign, formData);
+        },
+    });
+
+    const unlockFunctionBeMutate = useMutation({
+        mutationFn: async ({ data, formData }: { data: IData; formData: FormData }) => {
+            return await apiWallet.postUnLock(data?.idCampaign, formData);
+        },
+    });
+
     const lockFunction = async (data: IData) => {
+        let formData = new FormData();
+
         if (!connected) {
             return toastCore.error("Vui lòng kết nối ví!");
         }
-        // địa chỉ gắn cứng
-        const validateMessage = !scriptAddress
+        const validateMessage = !scriptAddressLock
             ? "No smart contract address, please select a smart contract"
             : !wallet || !connected
             ? "No connected wallet, please connect wallet first"
@@ -50,9 +72,11 @@ export const useWalletTransaction = () => {
         setValidateMessage(validateMessage);
 
         const amountToLock = +data.createContract.amount;
+
         const amountToLockLoveLace = (amountToLock * 1000000).toString();
 
         let datum = [dataAddress.pKeyHash];
+
         const d: any = {
             alternative: 0,
             fields: datum,
@@ -62,7 +86,7 @@ export const useWalletTransaction = () => {
             const tx = new Transaction({ initiator: wallet });
             tx.sendLovelace(
                 {
-                    address: scriptAddress,
+                    address: scriptAddressLock,
                     datum: {
                         value: d,
                         inline: true,
@@ -77,7 +101,7 @@ export const useWalletTransaction = () => {
                 name: data.createContract.auditName,
                 amount: amountToLock,
                 smartContractId: "66374d040da0bf446cda98c6",
-                scriptAddress: scriptAddress,
+                scriptAddress: scriptAddressLock,
                 assetName: "Ada",
                 isLockSuccess: false,
                 datum: datum,
@@ -93,27 +117,38 @@ export const useWalletTransaction = () => {
                 toastCore.error("Tạo hợp đồng thất bại");
                 return;
             }
-            console.log(txHash ? `Transaction is submmited: ${txHash}` : null);
+
             const { data: response } = await apiWallet.plutustxs({
                 ...payloadData,
                 isLockSuccess: true,
                 lockedTxHash: txHash,
             });
-            toastCore.success("Tạo hợp đồng thành công");
-            console.log("txHash", txHash);
-            console.log("response", response);
+
+            if (response) {
+                formData.append("id_lock", txHash);
+                formData.append("id_address_cardano", dataAddress?.address);
+
+                const { data: res } = await lockFunctionBeMutate.mutateAsync({ data, formData });
+                if (res?.result) {
+                    toastCore.success(res?.message);
+                    setTimeout(() => {
+                        window.close();
+                    }, 1200);
+                    return;
+                }
+                toastCore.error(res?.message);
+            }
         }
     };
 
     const unlockFunction = async (data: IData) => {
+        let formData = new FormData();
         if (!connected) {
             return toastCore.error("Vui lòng kết nối ví!");
         }
         const address = await wallet.getChangeAddress();
         const collateralUtxos = await wallet.getCollateral();
         let message = null;
-        console.log("utxo", utxo);
-        console.log("data.closingTheContract.reCeiveAddress", data.closingTheContract.reCeiveAddress);
 
         if (!utxo || !data.closingTheContract.reCeiveAddress || !address) {
             message = !utxo
@@ -129,12 +164,9 @@ export const useWalletTransaction = () => {
         // create the unlock asset transaction
         let txHash;
 
-        console.log("utxo", utxo);
-
         try {
             const tx = new Transaction({ initiator: wallet });
             console.log("tx 1", tx);
-            console.log("plutusScript", plutusScript);
             console.log("ok", {
                 value: utxo,
                 script: plutusScript,
@@ -149,14 +181,9 @@ export const useWalletTransaction = () => {
                 .sendValue(data.closingTheContract.reCeiveAddress, utxo) // address is recipient address
                 //   .setCollateral(collateralUtxos) //this is option, we either set or not set still works
                 .setRequiredSigners([address]);
-            console.log("tx 2", tx);
-            console.log("data.closingTheContract.reCeiveAddress", data.closingTheContract.reCeiveAddress);
-            console.log(" utxo", utxo);
-            const unsignedTx = await tx.build();
 
-            console.log(2);
+            const unsignedTx = await tx.build();
             const signedTx = await wallet.signTx(unsignedTx, true);
-            console.log(3);
             txHash = await wallet.submitTx(signedTx);
         } catch (err) {
             console.log(err);
@@ -172,7 +199,6 @@ export const useWalletTransaction = () => {
             return;
         }
 
-        console.log(`Transaction is submitted, TxHash: ${txHash}`);
         const res = await apiWallet.unlockPlutustxs(
             {
                 isUnlockSuccess: true,
@@ -181,20 +207,44 @@ export const useWalletTransaction = () => {
             },
             data.closingTheContract.lockedTxHash
         );
-        toastCore.success("Transaction is submitted");
-        console.log("unlockTxHash", txHash);
+
+        if (res) {
+            formData.append("id_unlock", txHash);
+            formData.append("id_unlock_address_cardano", dataAddress?.address);
+            formData.append("money_ada", data?.money_ada);
+            const { data: res } = await unlockFunctionBeMutate.mutateAsync({ data, formData });
+            if (res?.result) {
+                toastCore.success(res?.message);
+                setTimeout(() => {
+                    window.close();
+                }, 1200);
+                return;
+            }
+            toastCore.error(res?.message);
+        }
+        // toastCore.success("Transaction is submitted");
     };
 
-    const getUtxo = async (form: any) => {
-        const { data } = await apiWallet.findutxo(scriptAddress, form.watch("closingTheContract.lockedTxHash"));
+    const getUtxo = async (lockedTxHash: any) => {
+        const { data } = await apiWallet.findutxo(scriptAddressUnLock, lockedTxHash);
         setUtxo(data);
     };
 
-    const getContract = async (form: any) => {
+    const getContract = async () => {
         const { data } = await apiWallet.contracts("66374d040da0bf446cda98c6");
 
         setContract({ ...data, selected: data?._id });
     };
 
-    return { lockFunction, unlockFunction, getUtxo, getContract, contract, plutusScript, setPlutusScript, utxo };
+    return {
+        lockFunction,
+        unlockFunction,
+        getUtxo,
+        getContract,
+        contract,
+        plutusScript,
+        setPlutusScript,
+        utxo,
+        isLoading: lockFunctionBeMutate.isPending,
+    };
 };

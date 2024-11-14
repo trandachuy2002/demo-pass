@@ -2,15 +2,11 @@ import { KEY_COOKIES } from "@/constants/Cookie";
 import { CookieCore } from "@/lib/cookie";
 import { toastCore } from "@/lib/toast";
 import apiAuth from "@/services/auth/auth.services";
-import { useAuthStore } from "@/store/authStores";
-import { useDialogStore } from "@/store/dialogStores";
 import useCookieStore from "@/store/useCookieStore";
 import { useMutation } from "@tanstack/react-query";
 
-export const useAuthLoginRegister = () => {
+export const useAuthLoginRegisterBe = () => {
     const { setCookie } = useCookieStore();
-    const { setInformationUser } = useAuthStore();
-    const { setOpenDialogCustom } = useDialogStore();
 
     const loginMutation = useMutation({
         mutationFn: async (data: any) => {
@@ -30,15 +26,13 @@ export const useAuthLoginRegister = () => {
                     onSuccess: (res) => {
                         if (res) {
                             setCookie(KEY_COOKIES.WEBSITE_PAAS_BWORKS, res?.accessToken);
-                            setInformationUser(res);
-                            setOpenDialogCustom(false);
                             CookieCore.set("username", res?.fullName);
                             // toastCore.success("Đăng nhập thành công");
                             return;
                         }
                     },
                     onError: (error: any) => {
-                        toastCore.error(error?.response?.data?.message);
+                        // toastCore.error(error?.response?.data?.message);
                     },
                 }
             );
