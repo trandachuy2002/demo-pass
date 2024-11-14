@@ -245,6 +245,6 @@ export const useWalletTransactionBe = () => {
         plutusScript,
         setPlutusScript,
         utxo,
-        isLoading: lockFunctionBeMutate.isPending,
+        isLoading: lockFunctionBeMutate.isPending || unlockFunctionBeMutate.isPending,
     };
 };

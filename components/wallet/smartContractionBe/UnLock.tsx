@@ -7,7 +7,6 @@ import { useAuthLoginRegisterBe } from "@/hooks/wallet/smartcontract-be/useAuthB
 import { useGetCampaignBeUnLock } from "@/hooks/wallet/smartcontract-be/useGetCampaignBe";
 import { useWalletParseAddressBe } from "@/hooks/wallet/smartcontract-be/useWalletParseAddressBe";
 import { useWalletTransactionBe } from "@/hooks/wallet/smartcontract-be/useWalletTransactionBe";
-import { useWalletTransaction } from "@/hooks/wallet/useWalletTransaction";
 import useCookieStore from "@/store/useCookieStore";
 import { CardanoWallet, useAddress, useWallet } from '@meshsdk/react';
 import { useSearchParams } from "next/navigation";
@@ -66,6 +65,7 @@ const UnLock = () => {
             version: contract?.type === "PlutusScriptV1" ? "V1" : "V2",
         };
     };
+
     const address = useAddress()
 
     const { connected } = useWallet();
@@ -84,7 +84,7 @@ const UnLock = () => {
 
     const { data: dataCampaignBeUnLock } = useGetCampaignBeUnLock(id)
 
-    const { unlockFunction, getContract, getUtxo, utxo, contract, setPlutusScript } = useWalletTransactionBe()
+    const { unlockFunction, getContract, getUtxo, contract, setPlutusScript, isLoading } = useWalletTransactionBe()
 
     useEffect(() => {
         onSubmit({ name: "thuannguyen.fososoft@gmail.com", password: "Foso@2024" }, "login")
@@ -96,12 +96,10 @@ const UnLock = () => {
         }
     }, [address])
 
-
     useEffect(() => {
-        if (dataCampaignBeUnLock) {
+        if (dataCampaignBeUnLock?.result) {
             form.setValue("closingTheContract.lockedTxHash", dataCampaignBeUnLock?.id_lock)
-            form.setValue("closingTheContract.reCeiveAddress", dataCampaignBeUnLock?.address_smart_contract)
-            console.log("dataCampaignBeUnLock?.address_smart_contract", dataCampaignBeUnLock?.address_smart_contract);
+            // form.setValue("closingTheContract.reCeiveAddress", dataCampaignBeUnLock?.address_smart_contract)
             if (!connected) return
             getContract();
             getUtxo(dataCampaignBeUnLock?.id_lock)
@@ -143,16 +141,10 @@ const UnLock = () => {
                                         </FormLabel>
                                         <FormControl >
                                             <div
-                                                className={`w-full truncate line-clamp-1 block cursor-default text-black disabled:text-black disabled:opacity-100 h-11 2xl:text-base text-sm font-normal px-3 2xl:py-2.5 py-2 border rounded-[8px] border-[#272727] focus-visible:ring-0 focus-visible:ring-offset-0 disabled:bg-[#E6E8EC] disabled:text-muted-foreground`}
+                                                className={`w-full min-h-11 truncate line-clamp-1 block cursor-default text-black disabled:text-black disabled:opacity-100 2xl:text-base text-sm font-normal px-3 2xl:py-2.5 py-2 border rounded-[8px] border-[#272727] focus-visible:ring-0 focus-visible:ring-offset-0 disabled:bg-[#E6E8EC] disabled:text-muted-foreground`}
                                             >
                                                 {field.value}
                                             </div>
-                                            {/* <Input
-                                                type="text"
-                                                className={`w-full h-auto 2xl:text-base text-sm font-normal px-3 2xl:py-2.5 py-2 border border-transparent rounded-[8px] border-[#272727] focus-visible:ring-0 focus-visible:ring-offset-0 disabled:bg-[#E6E8EC] disabled:text-muted-foreground`}
-                                                placeholder="Locked Tx hash"
-                                                {...field}
-                                            /> */}
                                         </FormControl>
 
                                         {
@@ -181,12 +173,11 @@ const UnLock = () => {
                                         <FormControl>
                                             <Input
                                                 type="text"
-                                                className={`w-full h-auto 2xl:text-base text-sm font-normal px-3 2xl:py-2.5 py-2 border border-transparent rounded-[8px] border-[#272727] focus-visible:ring-0 focus-visible:ring-offset-0 disabled:bg-[#E6E8EC] disabled:text-muted-foreground`}
+                                                className={`w-full h-auto min-h-11 2xl:text-base text-sm font-normal px-3 2xl:py-2.5 py-2 border border-transparent rounded-[8px] border-[#272727] focus-visible:ring-0 focus-visible:ring-offset-0 disabled:bg-[#E6E8EC] disabled:text-muted-foreground`}
                                                 placeholder="Receive Address"
                                                 {...field}
                                             />
                                         </FormControl>
-
                                         {
                                             fieldState?.invalid && fieldState?.error && (
                                                 <FormMessage>{fieldState?.error?.message}</FormMessage>)
@@ -197,25 +188,19 @@ const UnLock = () => {
                         />
                     </div>
                     <div className="flex justify-end w-full">
-
-                        <div className="flex justify-end w-full">
-                            <ButtonLoading
-                                disabled={false}
-                                isStateloading={false}
-                                onClick={form.handleSubmit(async (data) => {
-                                    await unlockFunction({ ...data, idCampaign: id, money_ada: dataCampaignBeUnLock?.expense });
-                                })}
-                                title="Submit"
-                                type='submit'
-                                className='py-[13px] px-4 w-full dark:text-white h-auto bg-[#3276FA] hover:bg-[#3276FA]/80 rounded-xl'
-                            />
-                        </div>
+                        <ButtonLoading
+                            disabled={isLoading}
+                            isStateloading={isLoading}
+                            onClick={form.handleSubmit((data) => {
+                                unlockFunction({ ...data, idCampaign: id, money_ada: dataCampaignBeUnLock?.expense });
+                            })}
+                            title="Submit"
+                            type='submit'
+                            className='py-[13px] 2xl:text-lg text-base px-4 w-full dark:text-white h-auto bg-[#3276FA] hover:bg-[#3276FA]/80 rounded-xl'
+                        />
                     </div>
-
                 </Form>
             </div>
-
-
         </div>
     );
 };

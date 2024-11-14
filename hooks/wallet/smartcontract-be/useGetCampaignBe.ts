@@ -12,7 +12,10 @@ export const useGetCampaignBeLock = (id: string) => {
                     return data;
                 }
 
-                return data?.data;
+                return {
+                    ...data?.data,
+                    result: data?.result,
+                };
             } catch (err) {}
         },
         placeholderData: keepPreviousData,
@@ -34,7 +37,10 @@ export const useGetCampaignBeUnLock = (id: string) => {
                     return data;
                 }
 
-                return data?.data;
+                return {
+                    ...data?.data,
+                    result: data?.result,
+                };
             } catch (err) {}
         },
         placeholderData: keepPreviousData,

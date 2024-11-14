@@ -56,14 +56,15 @@ const defaulValues = {
         }
     ]
 }
-const formatContract = (contract: any): PlutusScript => {
-    return {
-        code: contract?.cborHex,
-        version: contract?.type === "PlutusScriptV1" ? "V1" : "V2",
-    };
-};
 
 const Lock = () => {
+    const formatContract = (contract: any): PlutusScript => {
+        return {
+            code: contract?.cborHex,
+            version: contract?.type === "PlutusScriptV1" ? "V1" : "V2",
+        };
+    };
+
     const address = useAddress()
 
     const { connected } = useWallet();
@@ -82,7 +83,7 @@ const Lock = () => {
 
     const { data: dataCampaignBe } = useGetCampaignBeLock(id)
 
-    const { lockFunction, unlockFunction, getContract, getUtxo, contract, setPlutusScript, plutusScript, utxo, isLoading: isLoadingLockFunction } = useWalletTransactionBe()
+    const { lockFunction, contract, setPlutusScript, isLoading: isLoadingLockFunction } = useWalletTransactionBe()
 
     useEffect(() => {
         onSubmit({ name: "thuannguyen.fososoft@gmail.com", password: "Foso@2024" }, "login")
@@ -96,7 +97,7 @@ const Lock = () => {
 
 
     useEffect(() => {
-        if (dataCampaignBe) {
+        if (dataCampaignBe?.result) {
             form.setValue("createContract.auditName", dataCampaignBe?.name)
             form.setValue("createContract.amount", dataCampaignBe?.expense)
         }
@@ -138,7 +139,7 @@ const Lock = () => {
                                         </FormLabel>
                                         <FormControl>
                                             <div
-                                                className={`w-full cursor-default text-black disabled:text-black disabled:opacity-100 h-11 2xl:text-base text-sm font-normal px-3 2xl:py-2.5 py-2 border rounded-[8px] border-[#272727] focus-visible:ring-0 focus-visible:ring-offset-0 disabled:bg-[#E6E8EC] disabled:text-muted-foreground`}
+                                                className={`w-full cursor-default text-black disabled:text-black disabled:opacity-100 min-h-11 2xl:text-base text-sm font-normal px-3 2xl:py-2.5 py-2 border rounded-[8px] border-[#272727] focus-visible:ring-0 focus-visible:ring-offset-0 disabled:bg-[#E6E8EC] disabled:text-muted-foreground`}
                                             >
                                                 {field.value}
                                             </div>
@@ -170,7 +171,7 @@ const Lock = () => {
                                         </FormLabel>
                                         <FormControl>
                                             <div
-                                                className={`w-full cursor-default text-black disabled:text-black disabled:opacity-100 h-11 2xl:text-base text-sm font-normal px-3 2xl:py-2.5 py-2 border rounded-[8px] border-[#272727] focus-visible:ring-0 focus-visible:ring-offset-0 disabled:bg-[#E6E8EC] disabled:text-muted-foreground`}
+                                                className={`w-full cursor-default text-black disabled:text-black disabled:opacity-100 min-h-11 2xl:text-base text-sm font-normal px-3 2xl:py-2.5 py-2 border rounded-[8px] border-[#272727] focus-visible:ring-0 focus-visible:ring-offset-0 disabled:bg-[#E6E8EC] disabled:text-muted-foreground`}
                                             >
                                                 {field.value}
                                             </div>
@@ -194,7 +195,7 @@ const Lock = () => {
                             })}
                             title="Submit"
                             type='submit'
-                            className='py-[13px] px-4 w-full dark:text-white h-auto bg-[#3276FA] hover:bg-[#3276FA]/80 rounded-xl'
+                            className='py-[13px] 2xl:text-lg text-base px-4 w-full dark:text-white h-auto bg-[#3276FA] hover:bg-[#3276FA]/80 rounded-xl'
                         />
                     </div>
                 </Form>
