@@ -11,6 +11,8 @@ import useCookieStore from '@/store/useCookieStore';
 import AlertDialogCustom from '../alert/AlertDialogCustom';
 import { useAlertDialogStore } from '@/store/useAlertDialogStore';
 import { checkPathName } from '@/utils/axios/axios-customize';
+import { ThemeProvider } from './ThemeProvider';
+import { KEY_COOKIES } from '@/constants/Cookie';
 const LayoutRoot = dynamic(() => import("@/components/layout/LayoutRoot"), { ssr: false });
 
 const LayoutContainer = ({ children }: Readonly<{ children: React.ReactNode; }>) => {
@@ -31,6 +33,13 @@ const LayoutContainer = ({ children }: Readonly<{ children: React.ReactNode; }>)
     }, [informationUser, openAlertDialog])
     return (
         <LayoutRoot>
+            {/* <ThemeProvider
+                attribute="class"
+                defaultTheme="light"
+                themes={KEY_COOKIES.THEME}
+                enableSystem={false}
+                disableTransitionOnChange
+            > */}
             <Toaster position="top-right" reverseOrder={false} />
             <QueryClientProvider client={queryClient}>
                 {children}
@@ -38,6 +47,7 @@ const LayoutContainer = ({ children }: Readonly<{ children: React.ReactNode; }>)
                 {openAlertDialog && <AlertDialogCustom />}
                 <ReactQueryDevtools initialIsOpen={false} />
             </QueryClientProvider>
+            {/* </ThemeProvider> */}
         </LayoutRoot>
     )
 }

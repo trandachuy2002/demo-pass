@@ -9,15 +9,7 @@ import { KEY_COOKIES } from '@/constants/Cookie';
 const LayoutRoot = ({ children }: Readonly<{ children: React.ReactNode; }>) => {
     return (
         <MeshProvider>
-            <ThemeProvider
-                attribute="class"
-                defaultTheme="light"
-                themes={KEY_COOKIES.THEME}
-                enableSystem={false}
-                disableTransitionOnChange
-            >
-                {children}
-            </ThemeProvider>
+            {children}
         </MeshProvider>
     )
 }
