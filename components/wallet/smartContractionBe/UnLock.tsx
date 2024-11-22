@@ -48,7 +48,8 @@ const defaulValues = {
     },
     closingTheContract: {
         lockedTxHash: "",
-        reCeiveAddress: ""
+        reCeiveAddress: "",
+        keyReceiveMoney: ""
     },
     datum: [
         {
@@ -68,7 +69,7 @@ const UnLock = () => {
 
     const address = useAddress()
 
-    const { connected } = useWallet();
+    const { connected, connect, wallet } = useWallet();
 
     const { getCookie } = useCookieStore()
 
@@ -98,6 +99,8 @@ const UnLock = () => {
 
     useEffect(() => {
         if (dataCampaignBeUnLock?.result) {
+            console.log("dataCampaignBeUnLock", dataCampaignBeUnLock);
+
             form.setValue("closingTheContract.lockedTxHash", dataCampaignBeUnLock?.id_lock)
             // form.setValue("closingTheContract.reCeiveAddress", dataCampaignBeUnLock?.address_smart_contract)
             if (!connected) return
@@ -111,12 +114,12 @@ const UnLock = () => {
     }, [contract]);
 
     return (
-        <div className="flex flex-col gap-4 justify-between items-center  max-w-[450px]">
-            <h1 className={'w-full text-start text-base text-black font-medium'}>Unlock smart contract</h1>
+        <div className="flex flex-col gap-6 justify-between items-center  max-w-[450px] min-w-[450px] bg-white dark:bg-[#242B4280] dark:shadow-none shadow-[0px_0px_120px_16px_#979FB71A]py-6 md:px-8 px-6 rounded-[12px]  w-full p-5">
+            <h1 className={'w-full text-start text-base text-black dark:text-white font-medium'}>Unlock smart contract</h1>
             <div className="flex items-center justify-start w-full gap-4">
                 <CardanoWallet />
                 <div className="flex flex-col gap-1">
-                    <h1 className="cursor-pointer font-semibold text-black">
+                    <h1 className="cursor-pointer font-semibold text-black dark:text-white">
                         {getCookie("username") ?? ""}
                     </h1>
                 </div>
@@ -141,7 +144,7 @@ const UnLock = () => {
                                         </FormLabel>
                                         <FormControl >
                                             <div
-                                                className={`w-full min-h-11 truncate line-clamp-1 block cursor-default text-black disabled:text-black disabled:opacity-100 2xl:text-base text-sm font-normal px-3 2xl:py-2.5 py-2 border rounded-[8px] border-[#272727] focus-visible:ring-0 focus-visible:ring-offset-0 disabled:bg-[#E6E8EC] disabled:text-muted-foreground`}
+                                                className={`w-full min-h-11 truncate line-clamp-1 block cursor-default text-black dark:text-white disabled:text-black disabled:opacity-100 2xl:text-base text-sm font-normal px-3 2xl:py-2.5 py-2 border rounded-[8px] border-[#272727] focus-visible:ring-0 focus-visible:ring-offset-0 disabled:bg-[#E6E8EC] disabled:text-muted-foreground`}
                                             >
                                                 {field.value}
                                             </div>
@@ -167,14 +170,49 @@ const UnLock = () => {
                             render={({ field, fieldState }) => {
                                 return (
                                     <FormItem className="col-span-1">
-                                        <FormLabel className="2xl:text-sm lg:text-xs font-semibold tracking-wider text-black">
+                                        <FormLabel className="2xl:text-sm lg:text-xs font-semibold tracking-wider text-black dark:text-white">
                                             Receive wallet address <span className="text-red-500">*</span>
                                         </FormLabel>
                                         <FormControl>
                                             <Input
                                                 type="text"
-                                                className={`w-full h-auto min-h-11 2xl:text-base text-sm font-normal px-3 2xl:py-2.5 py-2 border border-transparent rounded-[8px] border-[#272727] focus-visible:ring-0 focus-visible:ring-offset-0 disabled:bg-[#E6E8EC] disabled:text-muted-foreground`}
+                                                className={`w-full h-auto min-h-11 2xl:text-base text-sm font-normal px-3 2xl:py-2.5 py-2 border border-transparent rounded-[8px] dark:bg-[#040B24] border-[#272727] 
+                                                    dark:border-[#394456] dark:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 dark:text-white disabled:bg-[#E6E8EC] disabled:text-muted-foreground`}
                                                 placeholder="Receive Address"
+                                                {...field}
+                                            />
+
+                                        </FormControl>
+                                        {
+                                            fieldState?.invalid && fieldState?.error && (
+                                                <FormMessage>{fieldState?.error?.message}</FormMessage>)
+                                        }
+                                    </FormItem>
+                                );
+                            }}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="closingTheContract.keyReceiveMoney"
+                            rules={{
+                                required: {
+                                    value: true,
+                                    message: 'Required key receive money!',
+                                },
+                            }}
+                            render={({ field, fieldState }) => {
+                                return (
+                                    <FormItem className="col-span-2">
+                                        <FormLabel className="2xl:text-sm lg:text-xs font-semibold tracking-wider text-black dark:text-white">
+                                            Key Datum Receive Money <span className="text-red-500">*</span>
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                type="text"
+                                                className={`w-full h-auto min-h-11 2xl:text-base text-sm font-normal px-3 2xl:py-2.5 py-2 border border-transparent rounded-[8px] dark:bg-[#040B24] border-[#272727] 
+                                                    dark:border-[#394456] dark:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 dark:text-white disabled:bg-[#E6E8EC] disabled:text-muted-foreground`}
+                                                placeholder="Key Datum Receive Money"
                                                 {...field}
                                             />
                                         </FormControl>
@@ -192,7 +230,7 @@ const UnLock = () => {
                             disabled={isLoading}
                             isStateloading={isLoading}
                             onClick={form.handleSubmit((data) => {
-                                unlockFunction({ ...data, idCampaign: id, money_ada: dataCampaignBeUnLock?.expense });
+                                unlockFunction({ ...data, id_lock: dataCampaignBeUnLock?.id_lock, list_key: dataCampaignBeUnLock?.list_key, money_ada: dataCampaignBeUnLock?.expense });
                             })}
                             title="Submit"
                             type='submit'

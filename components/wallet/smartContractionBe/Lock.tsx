@@ -98,6 +98,8 @@ const Lock = () => {
 
     useEffect(() => {
         if (dataCampaignBe?.result) {
+            console.log("dataCampaignBe", dataCampaignBe);
+
             form.setValue("createContract.auditName", dataCampaignBe?.name)
             form.setValue("createContract.amount", dataCampaignBe?.expense)
         }
@@ -108,12 +110,12 @@ const Lock = () => {
     }, [contract]);
 
     return (
-        <div className="flex flex-col gap-4 justify-between items-center  max-w-[450px]">
-            <h1 className={'w-full text-start text-base text-black font-medium'}>Create smart contract</h1>
+        <div className="flex flex-col gap-6 justify-between items-center  max-w-[550px] min-w-[550px] bg-white dark:bg-[#242B4280] dark:shadow-none shadow-[0px_0px_120px_16px_#979FB71A]py-6 md:px-8 px-6 rounded-[12px] w-full p-5">
+            <h1 className={'w-full text-start text-base text-black dark:text-white font-medium'}>Create smart contract</h1>
             <div className="flex items-center justify-start w-full gap-4">
                 <CardanoWallet />
                 <div className="flex flex-col gap-1">
-                    <h1 className="cursor-pointer font-semibold text-black">
+                    <h1 className="cursor-pointer font-semibold text-black dark:text-white">
                         {getCookie("username") ?? ""}
                     </h1>
                 </div>
@@ -134,12 +136,12 @@ const Lock = () => {
                                 return (
                                     <FormItem className="col-span-1">
                                         <FormLabel
-                                            className="2xl:text-sm lg:text-xs font-semibold tracking-wider text-black">
+                                            className="2xl:text-sm lg:text-xs font-semibold tracking-wider text-black dark:text-white">
                                             Audit Name <span className="text-red-500">*</span>
                                         </FormLabel>
                                         <FormControl>
                                             <div
-                                                className={`w-full cursor-default text-black disabled:text-black disabled:opacity-100 min-h-11 2xl:text-base text-sm font-normal px-3 2xl:py-2.5 py-2 border rounded-[8px] border-[#272727] focus-visible:ring-0 focus-visible:ring-offset-0 disabled:bg-[#E6E8EC] disabled:text-muted-foreground`}
+                                                className={`w-full cursor-default text-black dark:text-white disabled:text-black disabled:opacity-100 min-h-11 2xl:text-base text-sm font-normal px-3 2xl:py-2.5 py-2 border rounded-[8px] border-[#272727] focus-visible:ring-0 focus-visible:ring-offset-0 disabled:bg-[#E6E8EC] disabled:text-muted-foreground`}
                                             >
                                                 {field.value}
                                             </div>
@@ -166,12 +168,12 @@ const Lock = () => {
                                 return (
                                     <FormItem className="col-span-1">
                                         <FormLabel
-                                            className="2xl:text-sm lg:text-xs font-semibold tracking-wider text-black">
+                                            className="2xl:text-sm lg:text-xs font-semibold tracking-wider text-black dark:text-white">
                                             Amount to lock (ADA) <span className="text-red-500">*</span>
                                         </FormLabel>
                                         <FormControl>
                                             <div
-                                                className={`w-full cursor-default text-black disabled:text-black disabled:opacity-100 min-h-11 2xl:text-base text-sm font-normal px-3 2xl:py-2.5 py-2 border rounded-[8px] border-[#272727] focus-visible:ring-0 focus-visible:ring-offset-0 disabled:bg-[#E6E8EC] disabled:text-muted-foreground`}
+                                                className={`w-full cursor-default text-black dark:text-white disabled:text-black disabled:opacity-100 min-h-11 2xl:text-base text-sm font-normal px-3 2xl:py-2.5 py-2 border rounded-[8px] border-[#272727] focus-visible:ring-0 focus-visible:ring-offset-0 disabled:bg-[#E6E8EC] disabled:text-muted-foreground`}
                                             >
                                                 {field.value}
                                             </div>
@@ -191,7 +193,7 @@ const Lock = () => {
                             disabled={isLoadingLockFunction}
                             isStateloading={isLoadingLockFunction}
                             onClick={form.handleSubmit((data) => {
-                                lockFunction({ ...data, idCampaign: id })
+                                lockFunction({ ...data, list_key: dataCampaignBe?.list_key })
                             })}
                             title="Submit"
                             type='submit'

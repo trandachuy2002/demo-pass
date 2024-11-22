@@ -8,12 +8,21 @@ const apiWallet = {
     async postCreateLock(id: string, data: FormData): Promise<any> {
         return await httpClient.post(`${url}/api_affiso/create_lock/${id}`, data);
     },
+    async postCreateListLock(data: FormData): Promise<any> {
+        return await httpClient.post(`${url}/api_affiso/create_list_lock`, data);
+    },
+    async getCampaignListUnlock(id: string): Promise<any> {
+        return await httpClient.get(`${url}/api_affiso/get_campaign_unlock/${id}`);
+    },
     async getCampaignUnlock(id: string): Promise<any> {
         return await httpClient.get(`${url}/api_affiso/get_campaign_unlock/${id}`);
     },
 
     async postUnLock(id: string, data: FormData): Promise<any> {
         return await httpClient.post(`${url}/api_affiso/create_unlock/${id}`, data);
+    },
+    async postListUnLock(data: FormData): Promise<any> {
+        return await httpClient.post(`${url}/api_affiso/create_list_unlock`, data);
     },
     parseAddress: (data: any) => {
         return httpClient.post(`${urlPaasBworks}/api/wallets/parseAddress`, data);
