@@ -140,10 +140,7 @@ const UnLockWorker = () => {
 
     return (
         <div className="flex flex-col gap-6 justify-between items-center  max-w-[450px] min-w-[450px] bg-white dark:bg-[#242B4280] dark:shadow-none shadow-[0px_0px_120px_16px_#979FB71A]py-6 md:px-8 px-6 rounded-[12px]  w-full p-5">
-            <div className="flex flex-col gap-2">
-                <h1 className={'w-full text-center text-base text-black dark:text-white font-medium'}>Unlock smart contract</h1>
-                <h2 className="text-[#6B7A94] dark:text-[#99A8C1] font-normal text-small-default text-center">You can get commission 1 time only!</h2>
-            </div>
+            <h1 className={'w-full text-center text-base text-black dark:text-white font-medium'}>Unlock smart contract</h1>
             <div className={'flex flex-col gap-4 w-full'}>
                 <Form {...form}>
                     <FormField
